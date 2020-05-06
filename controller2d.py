@@ -7,22 +7,11 @@
 import numpy as np
 from collections import deque
 
-
-class CUtils(object):
-    def __init__(self):
-        pass
-
-    def create_var(self, var_name, value):
-        if not var_name in self.__dict__:
-            self.__dict__[var_name] = value
-
-
 dt = 0.1
 
 
 class Controller2D(object):
     def __init__(self, waypoints):
-        self.vars = CUtils()
         self._current_x = 0
         self._current_y = 0
         self._current_yaw = 0
@@ -40,13 +29,10 @@ class Controller2D(object):
         self._2pi = 2.0 * np.pi
         self.e_buffer = deque(maxlen=30)
 
-        # self.K_P = 1.0
-        # self.K_D = 0.01
-        # self.K_I = 1.0
-
-        self.K_P = 1
-        self.K_D = 0.0000001
-        self.K_I = 0.2
+        # parameters for pid speed controller
+        self.K_P = 1.0
+        self.K_D = 0.0
+        self.K_I = 0.3
 
     def update_values(self, x, y, yaw, speed):
         self._current_x = x
@@ -73,18 +59,14 @@ class Controller2D(object):
     def update_waypoints(self, new_waypoints):
         self._waypoints = new_waypoints
 
-    def get_commands(self):
-        return self._set_throttle, self._set_steer, self._set_brake
-
     def set_throttle(self, input_throttle):
         # Clamp the throttle command to valid bounds
         throttle = np.fmax(np.fmin(input_throttle, 1.0), 0.0)
         self._set_throttle = throttle
 
     def set_steer(self, input_steer_in_rad):
-        # Covnert radians to [-1, 1]
+        # Convert radians to [-1, 1]
         input_steer = self._conv_rad_to_steer * input_steer_in_rad
-
         # Clamp the steering command to valid bounds
         steer = np.fmax(np.fmin(input_steer, 1.0), -1.0)
         self._set_steer = steer
@@ -105,34 +87,7 @@ class Controller2D(object):
         self.update_desired_speed()
         v_desired = self._desired_speed
         waypoints = self._waypoints
-        throttle_output = 0
 
-        ######################################################
-        ######################################################
-        # MODULE 7: DECLARE USAGE VARIABLES HERE
-        ######################################################
-        ######################################################
-        """
-            Use 'self.vars.create_var(<variable name>, <default value>)'
-            to create a persistent variable (not destroyed at each iteration).
-            This means that the value can be stored for use in the next
-            iteration of the control loop.
-
-            Example: Creation of 'v_previous', default value to be 0
-            self.vars.create_var('v_previous', 0.0)
-
-            Example: Setting 'v_previous' to be 1.0
-            self.vars.v_previous = 1.0
-
-            Example: Accessing the value from 'v_previous' to be used
-            throttle_output = 0.5 * self.vars.v_previous
-        """
-        self.vars.create_var('v_previous', 0.0)
-        self.vars.create_var('throttle_previous', 0.0)
-        self.vars.create_var('int_val', 0.0)
-        self.vars.create_var('last_error', 0.0)
-
-        # Skip the first frame to store previous values properly
         if self._start_control_loop:
             """
                 Controller iteration code block.
@@ -166,20 +121,7 @@ class Controller2D(object):
                     brake_output    : Brake output (0 to 1)
             """
 
-            ######################################################
-            ######################################################
-            # MODULE 7: IMPLEMENTATION OF LONGITUDINAL CONTROLLER HERE
-            ######################################################
-            ######################################################
-            """
-                Implement a longitudinal controller here. Remember that you can
-                access the persistent variables declared above here. For
-                example, can treat self.vars.v_previous like a "global variable".
-            """
-
-            # Change these outputs with the longitudinal controller. Note that
-            # brake_output is optional and is not required to pass the
-            # assignment, as the car will naturally slow down over time.
+            # LONGITUDINAL CONTROLLER HERE
             brake_output = 0
 
             _e = v_desired - v
@@ -192,29 +134,10 @@ class Controller2D(object):
                 _de = 0.0
                 _ie = 0.0
 
-            # throttle_output = np.clip((self.K_P * _e) + (self.K_D * _de / dt) + (self.K_I * _ie * dt), 0.0, 1.0)
+            throttle_output = np.clip((self.K_P * _e) + (self.K_D * _de / dt) + (self.K_I * _ie * dt), 0.0, 1.0)
 
-            rst = self.K_P * _e + self.K_D * _de / dt + self.K_I * _ie * dt
-            if rst > 0:
-                throttle_output = np.tanh(rst)
-                throttle_output = max(0.0, min(1.0, throttle_output))
-                if throttle_output - self.vars.throttle_previous > 0.1:
-                    throttle_output = self.vars.throttle_previous + 0.1
-            else:
-                throttle_output = 0
-
-            ######################################################
-            ######################################################
-            # MODULE 7: IMPLEMENTATION OF LATERAL CONTROLLER HERE
-            ######################################################
-            ######################################################
-            """
-                Implement a lateral controller here. Remember that you can
-                access the persistent variables declared above here. For
-                example, can treat self.vars.v_previous like a "global variable".
-            """
-            # Use stanley controller for lateral control
-            # 0. spectify stanley params
+            # LATERAL CONTROLLER HERE
+            # Use stanley controller for lateral control.
             k_e = 0.3
             k_v = 10
 
@@ -257,22 +180,7 @@ class Controller2D(object):
             # 4. update
             steer_output = steer_expect
 
-            ######################################################
             # SET CONTROLS OUTPUT
-            ######################################################
             self.set_throttle(throttle_output)  # in percent (0 to 1)
             self.set_steer(steer_output)  # in rad (-1.22 to 1.22)
             self.set_brake(brake_output)  # in percent (0 to 1)
-
-        ######################################################
-        ######################################################
-        # MODULE 7: STORE OLD VALUES HERE (ADD MORE IF NECESSARY)
-        ######################################################
-        ######################################################
-        """
-            Use this block to store old values (for example, we can store the
-            current x, y, and yaw values here using persistent variables for use
-            in the next iteration)
-        """
-        self.vars.v_previous = v  # Store forward speed to be used in next step
-        self.vars.throttle_previous = throttle_output

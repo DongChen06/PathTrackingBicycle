@@ -11,7 +11,16 @@ INTERP_DISTANCE_RES = 0.01  # distance between interpolated points
 INTERP_LOOKAHEAD_DISTANCE = 20  # lookahead in meters
 DIST_THRESHOLD_TO_LAST_WAYPOINT = 4.0  # some distance from last position before simulation ends
 
+# use linear or nonlinear bicycle models
 non_linear_model = True  # True, False
+if non_linear_model:
+    trajectory_path = "trajectory_non_linear.png"
+    speed_path = "speed_non_linear.png"
+else:
+    trajectory_path = "trajectory_linear.png"
+    speed_path = "speed_linear.png"
+
+# show the animation plot during the simulation, default is False.
 show_animation = False
 
 
@@ -39,8 +48,8 @@ def main():
         # Linearly interpolate between waypoints and store in a list
         wp_interp = []  # interpolated values
         # (rows = waypoints, columns = [x, y, v])
-        wp_interp_hash = []  # hash table which indexes waypoints_np
-        # to the index of the waypoint in wp_interp
+        wp_interp_hash = []
+        # hash table which indexes waypoints_np to the index of the waypoint in wp_interp
         interp_counter = 0  # counter for current interpolated point index
         reached_the_end = False
 
@@ -168,7 +177,7 @@ def main():
 
             controller.update_controls()
             speed_ref.append(controller._desired_speed)
-            cmd_throttle, cmd_steer, cmd_brake = controller.get_commands()
+            cmd_throttle, cmd_steer, cmd_brake = controller._set_throttle, controller._set_steer, controller._set_brake
 
             # Output controller command to the vehicle and update the states
             state.update(a=cmd_throttle, delta=cmd_steer)
@@ -216,14 +225,14 @@ def plot_fn(x_history, y_history, x_ref, y_ref, speed_history, speed_ref):
     plt.xlim(-250, 400)
     plt.ylim(-800, 100)
     plt.legend()
-    plt.savefig('results/trajectory_non_linear.png')  # trajectory_non_linear. trajectory_linear
+    plt.savefig('results/' + trajectory_path)  # trajectory_non_linear. trajectory_linear
 
     plt.figure(2)
     plt.plot(speed_history, 'b-', label='real')
     plt.plot(speed_ref, 'r--', label='ref')
-    plt.title('results/Vehicle speed')
+    plt.title('Vehicle speed')
     plt.legend()
-    plt.savefig('results/speed_non_linear.png')  # speed_non_linear. speed_linear
+    plt.savefig('results/' + speed_path)  # speed_non_linear. speed_linear
 
 
 if __name__ == '__main__':
