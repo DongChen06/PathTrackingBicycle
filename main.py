@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 import csv, os
@@ -9,15 +8,14 @@ from bicyclemodel import NonLinearBicycleModel, LinearBicycleModel
 # waypoint file to load
 WAYPOINTS_FILENAME = 'racetrack_waypoints.txt'
 INTERP_DISTANCE_RES = 0.01  # distance between interpolated points
-INTERP_LOOKAHEAD_DISTANCE = 20   # lookahead in meters
+INTERP_LOOKAHEAD_DISTANCE = 20  # lookahead in meters
 DIST_THRESHOLD_TO_LAST_WAYPOINT = 4.0  # some distance from last position before simulation ends
 
-non_linear_model = False  # True, False
+non_linear_model = True  # True, False
 show_animation = False
 
 
 def main():
-
     try:
         #############################################
         # Load Waypoints
@@ -58,7 +56,7 @@ def main():
             # incrementally add interpolated points until the next waypoint
             # is about to be reached.
             num_pts_to_interp = int(np.floor(wp_distance[i] / \
-                                            float(INTERP_DISTANCE_RES)) - 1)
+                                             float(INTERP_DISTANCE_RES)) - 1)
             wp_vector = waypoints_np[i + 1] - waypoints_np[i]
             wp_uvector = wp_vector / np.linalg.norm(wp_vector)
             for j in range(num_pts_to_interp):
@@ -79,7 +77,6 @@ def main():
         else:
             state = LinearBicycleModel(x=-180.3353216786993, y=79.53986286885691, yaw=np.radians(20.0))
 
-
         start_x, start_y, start_yaw = state.x, state.y, state.yaw
         state.update(a=0, delta=0)
         x_history = [start_x]
@@ -95,21 +92,22 @@ def main():
 
         while True:
             steps = steps + 1
-            
-            # Update pose, timestamp
+
+            # Update position, timestamp
             current_x, current_y, current_yaw = state.x, state.y, state.yaw
             current_speed = state.v
 
-            if steps % 1000==0:
-                print("step {s}, cx {cx}, cy {cy}, cv {cv}".format(s = steps, cx = current_x, cy = current_y, cv =current_speed))
-            
+            if steps % 1000 == 0:
+                print(
+                    "step {s}, cx {cx}, cy {cy}, cv {cv}".format(s=steps, cx=current_x, cy=current_y, cv=current_speed))
+
             # Store history
             x_history.append(current_x)
             y_history.append(current_y)
             yaw_history.append(current_yaw)
             speed_history.append(current_speed)
 
-            # Controller update (this uses the controller2d.py implementation)
+            # Controller update, this uses the controller2d.py implementation
             closest_distance = np.linalg.norm(np.array([
                 waypoints_np[closest_index, 0] - current_x,
                 waypoints_np[closest_index, 1] - current_y]))
@@ -124,6 +122,7 @@ def main():
                 new_distance = np.linalg.norm(np.array([
                     waypoints_np[new_index, 0] - current_x,
                     waypoints_np[new_index, 1] - current_y]))
+
             new_distance = closest_distance
             new_index = closest_index
             while new_distance <= closest_distance:
@@ -159,47 +158,47 @@ def main():
             # for the next controller update.
             new_waypoints = \
                 wp_interp[wp_interp_hash[waypoint_subset_first_index]: \
-                        wp_interp_hash[waypoint_subset_last_index] + 1]
-            
+                          wp_interp_hash[waypoint_subset_last_index] + 1]
+
             controller.update_waypoints(new_waypoints)
 
             # Update the other controller values and controls
             controller.update_values(current_x, current_y, current_yaw,
-                                    current_speed)
-            
+                                     current_speed)
+
             controller.update_controls()
             speed_ref.append(controller._desired_speed)
             cmd_throttle, cmd_steer, cmd_brake = controller.get_commands()
 
-            # Output controller command to CARLA server
+            # Output controller command to the vehicle and update the states
             state.update(a=cmd_throttle, delta=cmd_steer)
 
-            # Find if reached the end of waypoint. If the car is within
-            # DIST_THRESHOLD_TO_LAST_WAYPOINT to the last waypoint,
-            # the simulation will end.
+            # Find if reached the end of waypoint. If the car is within DIST_THRESHOLD_TO_LAST_WAYPOINT to the last waypoint,
+            # then simulation will be terminated.
             dist_to_last_waypoint = np.linalg.norm(np.array([
                 waypoints[-1][0] - current_x,
                 waypoints[-1][1] - current_y]))
-            if dist_to_last_waypoint < DIST_THRESHOLD_TO_LAST_WAYPOINT or current_x > 320:  # or steps > 1200, 1700
+            if dist_to_last_waypoint < DIST_THRESHOLD_TO_LAST_WAYPOINT or current_x > 320:
                 reached_the_end = True
                 print("Reached the end of path. Writing to controller_output...")
             if reached_the_end:
+                # save the plot at the end of the simulation
                 plot_fn(x_history, y_history, x_ref, y_ref, speed_history, speed_ref)
                 break
 
             if show_animation:
                 plt.cla()
-                plot_vehicle(current_x, current_y, current_yaw, x_history, y_history, x_ref, y_ref, steps)
+                plot_vehicle(x_history, y_history, x_ref, y_ref, steps)
     except:
         print("finished with errors...")
 
 
-def plot_vehicle(x, y, theta, x_traj, y_traj, x_ref, y_ref, frame):
+def plot_vehicle(x_traj, y_traj, x_ref, y_ref, frame):
     plt.plot(x_traj, y_traj, 'b--')
     plt.plot(x_ref, y_ref, 'r-')
     # for stopping simulation with the esc key.
     plt.gcf().canvas.mpl_connect('key_release_event',
-            lambda event: [exit(0) if event.key == 'escape' else None])
+                                 lambda event: [exit(0) if event.key == 'escape' else None])
 
     plt.xlim(-250, 400)
     plt.ylim(-800, 100)
@@ -209,23 +208,23 @@ def plot_vehicle(x, y, theta, x_traj, y_traj, x_ref, y_ref, frame):
 
 
 def plot_fn(x_history, y_history, x_ref, y_ref, speed_history, speed_ref):
-    os.makedirs("results", exist_ok = True)
-    plot1 = plt.figure(1)
+    os.makedirs("results", exist_ok=True)
+    plt.figure(1)
     plt.plot(x_history, y_history, 'b-', label='real')
     plt.plot(x_ref, y_ref, 'r--', label='ref')
     plt.title('Vehicle trajectory')
     plt.xlim(-250, 400)
     plt.ylim(-800, 100)
     plt.legend()
-    plt.savefig('results/trajectory.png')
+    plt.savefig('results/trajectory_non_linear.png')  # trajectory_non_linear. trajectory_linear
 
-    plot2 = plt.figure(2)
+    plt.figure(2)
     plt.plot(speed_history, 'b-', label='real')
     plt.plot(speed_ref, 'r--', label='ref')
     plt.title('results/Vehicle speed')
     plt.legend()
-    plt.savefig('results/speed.png')
-    
+    plt.savefig('results/speed_non_linear.png')  # speed_non_linear. speed_linear
+
 
 if __name__ == '__main__':
     main()
