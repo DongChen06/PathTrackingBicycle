@@ -3,7 +3,7 @@ Implementation of path tracking with a linear/non-linear bicycle model. We use t
 
 ## Bicycle Models
 
-We use the kinematic and dynamic bicycle models mentioned in ref.6.
+We use the kinematic and dynamic bicycle models as mentioned in ref.6.
 
 <p align="center">
      <img src="docs/carmodel.png" alt="output_example" width="30%" height="20%">
