@@ -12,8 +12,8 @@ Iz = 2250.0  # kg/m2
 m = 1500.0  # kg
 
 
-# non-linear bicycle model
-class NonLinearBicycleModel(object):
+# non-linear lateral bicycle model
+class NonLinearBicycleModel():
     def __init__(self, x=0.0, y=0.0, yaw=0.0, vx=0.01, vy=0, omega=0.0):
         self.x = x
         self.y = y
@@ -21,9 +21,11 @@ class NonLinearBicycleModel(object):
         self.vx = vx
         self.vy = vy
         self.omega = omega
-        self.v = np.hypot(self.vx, self.vy)
+        # Aerodynamic and friction coefficients
+        self.c_a = 1.36
+        self.c_r1 = 0.01
 
-    def update(self, a, delta):
+    def update(self, throttle, delta):
         delta = np.clip(delta, -max_steer, max_steer)
         self.x = self.x + self.vx * math.cos(self.yaw) * dt - self.vy * math.sin(self.yaw) * dt
         self.y = self.y + self.vx * math.sin(self.yaw) * dt + self.vy * math.cos(self.yaw) * dt
@@ -31,10 +33,12 @@ class NonLinearBicycleModel(object):
         self.yaw = normalize_angle(self.yaw)
         Ffy = -Cf * math.atan2(((self.vy + Lf * self.omega) / self.vx - delta), 1.0)
         Fry = -Cr * math.atan2((self.vy - Lr * self.omega) / self.vx, 1.0)
-        self.vx = self.vx + (a - Ffy * math.sin(delta) / m + self.vy * self.omega) * dt
+        R_x = self.c_r1 * self.vx
+        F_aero = self.c_a * self.vx ** 2
+        F_load = F_aero + R_x
+        self.vx = self.vx + (throttle - Ffy * math.sin(delta) / m - F_load/m + self.vy * self.omega) * dt
         self.vy = self.vy + (Fry / m + Ffy * math.cos(delta) / m - self.vx * self.omega) * dt
         self.omega = self.omega + (Ffy * Lf * math.cos(delta) - Fry * Lr) / Iz * dt
-        self.v = np.hypot(self.vx, self.vy)
 
 
 class LinearBicycleModel(object):
@@ -53,7 +57,7 @@ class LinearBicycleModel(object):
         self.yaw = yaw
         self.v = v
 
-    def update(self, a, delta):
+    def update(self, throttle, delta):
         """
         Update the state of the vehicle.
         Stanley Control uses bicycle model.
@@ -66,7 +70,7 @@ class LinearBicycleModel(object):
         self.y += self.v * np.sin(self.yaw) * dt
         self.yaw += self.v / L * np.tan(delta) * dt
         self.yaw = normalize_angle(self.yaw)
-        self.v += a * dt
+        self.v += throttle * dt
 
 
 def normalize_angle(angle):
