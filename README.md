@@ -2,7 +2,6 @@
 Implementation of path tracking with a linear/non-linear bicycle model. We use the PID and standley controllers to control the longitudinal and lateral movements, respectively. We use the key idea of ref.[1], while replacing the vehicle dynamics in Carla simulator with linear/non-linear bicycle models. 
 
 ## Bicycle Models
--------
 
 - Kinematic Bicycle Model. 
 
@@ -10,7 +9,6 @@ Implementation of path tracking with a linear/non-linear bicycle model. We use t
 - Non-linear bicycle model.
 
 ## Controllers
--------
 
 - PID controller.
 
@@ -21,7 +19,7 @@ Given the current speed v(t) we minimize the error term e = v_desired − v_curr
      <br>
 </p>
 
-Where 
+Where KP, KI and KD are proportional, integral and derivative parameters, respectively.
 
 
 - Stanley Controller.
@@ -36,8 +34,8 @@ steering angle δ_{SC}(t) at the current vehicle speed v(t) is given by
 where k is a gain parameter.
 
 
-## experiments
--------
+## Experiments
+
 
 We test vehicle models with PID and standley controllers. 
 
@@ -67,15 +65,15 @@ The testing results on non-linear bicycle models.
 
 
 ## ToDO Lists:
--------
 
 - [ ] For better tracking accuracy, we use the linearly interpolation between waypoints. While We can also use better methods like spline interpolation, for example. [see ref.2]
 - [ ] To better improvement, we can use seperate longitudinal and lateral bicycle model. In our non-linear bicycle model, we simply consider Fx as the driving force, while this is not how it is done in a real vehicle (engine -> torque converter -> transmission -> wheel). For better performance, please go to ref.3 and ref.4. 
 - [ ] Refine the performance.
 - [ ] For better tracking performance, we can also try control methods, like MPC.
 
+
+
 ## Reference:
--------
 
 1. [Self Driving Cars Longitudinal and Lateral Control Design](https://github.com/enginBozkurt/SelfDrivingCarsControlDesign)
 
