@@ -14,13 +14,26 @@ Implementation of path tracking with a linear/non-linear bicycle model. We use t
 
 - PID controller.
 
+Given the current speed v(t) we minimize the error term e = v_desired − v_current using a PID controller for the throttle value. The range for the throttle values is [-1, 1]. The formula is
+
+<p align="center">
+     <img src="docs/pid.png" alt="output_example" width="30%" height="20%">
+     <br>
+</p>
+
+Where 
 
 
 - Stanley Controller.
 
 For lateral control, we adapt the standley control(To learn more about the Stanley Control, check out ref.5). There are two error metrics: the distance to centerline d(t) and the relative angle ψ(t). The control law to calculate the
 steering angle δ_{SC}(t) at the current vehicle speed v(t) is given by 
+<p align="center">
+     <img src="docs/sc.png" alt="output_example" width="30%" height="20%">
+     <br>
+</p>
 
+where k is a gain parameter.
 
 
 ## experiments
