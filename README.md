@@ -5,6 +5,12 @@ Implementation of path tracking with a linear/non-linear bicycle model. We use t
 
 We use the kinematic and dynamic bicycle models mentioned in ref.6.
 
+<p align="center">
+     <img src="docs/carmodel.png" alt="output_example" width="30%" height="20%">
+     <br> Fig.1 Kinematic Bicycle Model
+</p>
+
+
 - Linear Bicycle Model. 
 
 <p align="center">
@@ -55,23 +61,23 @@ We test vehicle models with PID and standley controllers.
 
 <p align="center">
      <img src="results/speed_linear.png" alt="output_example" width="60%" height="60%">
-     <br>Fig.1 Speed tracking of linear vehicle model
+     <br>Fig.2 Speed tracking of linear vehicle model
 </p>
 
 <p align="center">
      <img src="results/trajectory_linear.png" alt="output_example" width="60%" height="60%">
-     <br>Fig.2 Path tracking of linear vehicle model
+     <br>Fig.3 Path tracking of linear vehicle model
 </p>
 
 The testing results on non-linear bicycle models.
 <p align="center">
      <img src="results/speed_non_linear.png" alt="output_example" width="60%" height="60%">
-     <br>Fig.3 Speed tracking of non-linear vehicle model
+     <br>Fig.4 Speed tracking of non-linear vehicle model
 </p>
 
 <p align="center">
      <img src="results/trajectory_non_linear.png" alt="output_example" width="60%" height="60%">
-     <br>Fig.4 Path tracking of non-linear vehicle model
+     <br>Fig.5 Path tracking of non-linear vehicle model
 </p>
 
 
@@ -99,4 +105,4 @@ The testing results on non-linear bicycle models.
 
 5. [Snider, J. M., "Automatic Steering Methods for Autonomous Automobile Path Tracking", Robotics Institute, Carnegie Mellon University, Pittsburg (February 2009).]( https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
 
-6. [Kong, Jason, et al. "Kinematic and dynamic vehicle models for autonomous driving control design." 2015 IEEE Intelligent Vehicles Symposium (IV). IEEE, 2015.] (https://ieeexplore.ieee.org/document/7225830)
+6. [Kong, Jason, et al. "Kinematic and dynamic vehicle models for autonomous driving control design." 2015 IEEE Intelligent Vehicles Symposium (IV). IEEE, 2015.] (https://borrelli.me.berkeley.edu/pdfpub/IV_KinematicMPC_jason.pdf)
