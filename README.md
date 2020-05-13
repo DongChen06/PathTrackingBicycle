@@ -89,7 +89,7 @@ The testing results on non-linear bicycle models.
 - [ ] For better tracking accuracy, we use the linearly interpolation between waypoints. While We can also use better methods like spline interpolation, for example. [see ref.2]
 - [ ] To better improvement, we can use seperate longitudinal and lateral bicycle model. In our non-linear bicycle model, we simply consider Fx as the driving force, while this is not how it is done in a real vehicle (engine -> torque converter -> transmission -> wheel). For better performance, please go to ref.3 and ref.4. 
 - [ ] Refine the performance.
-- [ ] For better tracking performance, we can also try control methods, like MPC.
+- [ ] For better tracking performance, we can also try control methods, like MPC. [see ref.7]
 
 
 
@@ -106,3 +106,5 @@ The testing results on non-linear bicycle models.
 5. [Snider, J. M., "Automatic Steering Methods for Autonomous Automobile Path Tracking", Robotics Institute, Carnegie Mellon University, Pittsburg (February 2009).]( https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
 
 6. [Kong, Jason, et al. "Kinematic and dynamic vehicle models for autonomous driving control design." 2015 IEEE Intelligent Vehicles Symposium (IV). IEEE, 2015.] (https://borrelli.me.berkeley.edu/pdfpub/IV_KinematicMPC_jason.pdf)
+
+7. [model_predictive_speed_and_steer_control](https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathTracking/model_predictive_speed_and_steer_control)
