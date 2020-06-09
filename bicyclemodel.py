@@ -41,6 +41,8 @@ class NonLinearBicycleModel():
         self.omega = self.omega + (Ffy * Lf * math.cos(delta) - Fry * Lr) / Iz * dt
 
 
+# reference: https://www.coursera.org/lecture/intro-self-driving-cars/lesson-2-the-kinematic-bicycle-model-Bi8yE,
+# we used the "Rear Alex Bicycle model" as mentioned in that tutorial. TODO: update Read.me
 class LinearBicycleModel(object):
     """
     Class representing the state of a vehicle.
